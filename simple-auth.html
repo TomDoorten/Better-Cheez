@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Discord OAuth Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .step { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+        .error { background: #ffe6e6; border-color: #ff9999; }
+        .success { background: #e6ffe6; border-color: #99ff99; }
+        .info { background: #e6f3ff; border-color: #99ccff; }
+        button { padding: 10px 20px; background: #7289da; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .test-url { word-break: break-all; background: #f0f0f0; padding: 5px; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>Discord OAuth Configuration Debug</h1>
+    
+    <div class="error">
+        <h3>Current Issue: Discord Access Denied</h3>
+        <p>This typically means one of these issues:</p>
+        <ul>
+            <li>Redirect URI not added to Discord application</li>
+            <li>Bot requires code grant enabled</li>
+            <li>Invalid scope configuration</li>
+            <li>Application not configured for OAuth2</li>
+        </ul>
+    </div>
+    
+    <div class="info">
+        <h3>Required Discord Application Settings</h3>
+        <p><strong>In Discord Developer Portal → Your Application → OAuth2 → General:</strong></p>
+        <ol>
+            <li><strong>Redirects:</strong> Add this exact URL:
+                <pre>https://f11710d6-e245-4975-b814-c2ff623077b5-00-2ie9nzseqsf22.worf.replit.dev/api/auth/discord/callback</pre>
+            </li>
+            <li><strong>Bot Settings:</strong> Go to Bot section and enable "Requires OAuth2 Code Grant"</li>
+            <li><strong>OAuth2 Scopes:</strong> Make sure "identify" scope is available</li>
+        </ol>
+    </div>
+    
+    <div class="step">
+        <h3>Test Different OAuth Configurations:</h3>
+        <p>Try these URLs directly in your browser after configuring Discord:</p>
+        
+        <div class="test-url">
+            <strong>1. Basic Identify Only:</strong><br>
+            <a href="https://discord.com/api/oauth2/authorize?client_id=1386703364036759762&redirect_uri=https%3A%2F%2Ff11710d6-e245-4975-b814-c2ff623077b5-00-2ie9nzseqsf22.worf.replit.dev%2Fapi%2Fauth%2Fdiscord%2Fcallback&response_type=code&scope=identify" target="_blank">Test Basic Auth</a>
+        </div>
+        
+        <div class="test-url">
+            <strong>2. With Email Scope:</strong><br>
+            <a href="https://discord.com/api/oauth2/authorize?client_id=1386703364036759762&redirect_uri=https%3A%2F%2Ff11710d6-e245-4975-b814-c2ff623077b5-00-2ie9nzseqsf22.worf.replit.dev%2Fapi%2Fauth%2Fdiscord%2Fcallback&response_type=code&scope=identify%20email" target="_blank">Test with Email</a>
+        </div>
+        
+        <div class="test-url">
+            <strong>3. With Guilds Scope:</strong><br>
+            <a href="https://discord.com/api/oauth2/authorize?client_id=1386703364036759762&redirect_uri=https%3A%2F%2Ff11710d6-e245-4975-b814-c2ff623077b5-00-2ie9nzseqsf22.worf.replit.dev%2Fapi%2Fauth%2Fdiscord%2Fcallback&response_type=code&scope=identify%20guilds" target="_blank">Test with Guilds</a>
+        </div>
+    </div>
+    
+    <div class="info">
+        <h3>Alternative: Manual Bot Invitation</h3>
+        <p>If OAuth continues to fail, you can invite the bot directly with this URL:</p>
+        <div class="test-url">
+            <a href="https://discord.com/api/oauth2/authorize?client_id=1386703364036759762&permissions=1099816856646&scope=bot%20applications.commands" target="_blank">Invite Bot to Server</a>
+        </div>
+    </div>
+    
+    <script>
+        // Check for OAuth callback parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('code')) {
+            document.body.insertAdjacentHTML('afterbegin', 
+                '<div class="success"><h3>OAuth Success!</h3><p>Authorization code received: ' + 
+                urlParams.get('code').substring(0, 20) + '...</p></div>'
+            );
+        } else if (urlParams.get('error')) {
+            document.body.insertAdjacentHTML('afterbegin', 
+                '<div class="error"><h3>OAuth Error:</h3><p>' + 
+                urlParams.get('error') + ': ' + (urlParams.get('error_description') || 'Unknown error') + 
+                '</p></div>'
+            );
+        }
+    </script>
+</body>
+</html>
